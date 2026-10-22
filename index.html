@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reword</title>
+<meta name="description" content="An Android app that rewrites your texts and emails in one tap, in the style and reading level you choose.">
+<link rel="icon" href="icon.png">
+<style>
+  :root { --text: #1f2937; --muted: #4b5563; --bg: #ffffff; --card: #f3f4f6; --link: #1e5aa8; --accent: #1e5aa8; }
+  @media (prefers-color-scheme: dark) {
+    :root { --text: #e5e7eb; --muted: #9ca3af; --bg: #111827; --card: #1f2937; --link: #93c5fd; --accent: #3b82f6; }
+  }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 720px; margin: 0 auto; padding: 32px 16px 64px; }
+  header { display: flex; align-items: center; gap: 16px; }
+  header img { width: 72px; height: 72px; border-radius: 16px; flex: none; }
+  h1 { font-size: 1.8em; margin: 0; line-height: 1.2; }
+  .tagline { color: var(--muted); margin: 4px 0 0; }
+  h2 { font-size: 1.2em; margin-top: 2em; }
+  a { color: var(--link); }
+  li { margin: 0.3em 0; }
+  .steps { background: var(--card); border-radius: 12px; padding: 16px 20px; }
+  .steps ol { margin: 0; padding-left: 1.2em; }
+  .button { display: inline-block; background: var(--accent); color: #fff; padding: 2px 10px;
+            border-radius: 999px; font-size: 0.9em; white-space: nowrap; }
+  footer { margin-top: 3em; padding-top: 1em; border-top: 1px solid var(--card); color: var(--muted); font-size: 0.9em; }
+</style>
+</head>
+<body>
+<main>
+<header>
+  <img src="icon.png" alt="">
+  <div>
+    <h1>Reword</h1>
+    <p class="tagline">Type it fast. Send it right.</p>
+  </div>
+</header>
+
+<p>Reword is an Android app that turns quick, messy messages into clear ones. Type or use
+voice to text like you always do, tap <span class="button">✎ Rewrite</span> above the message box,
+and tap Replace.</p>
+
+<div class="steps">
+<ol>
+  <li>Type your message in your texting, chat or email app.</li>
+  <li>Tap ✎ Rewrite and pick a style and reading level.</li>
+  <li>Check the rewrite, then tap Replace. You decide whether to send it.</li>
+</ol>
+</div>
+
+<h2>Works where you type</h2>
+<p>The Rewrite button appears in Samsung Messages, Google Messages, WhatsApp, WhatsApp Business, Telegram,
+Messenger, Signal, Discord, Slack, Google Chat, Teams, Gmail, Samsung Email and Outlook. In other apps,
+use the Rewrite keyboard, the Quick Settings tile, or select text and choose Rewrite.</p>
+
+<h2>Styles and reading levels</h2>
+<ul>
+  <li><strong>13 styles:</strong> Professional, Friendly, Concise, Formal, Apologetic, Street Slang,
+    Southern, Shakespeare, Pirate, Cowboy, Gen Z, LinkedIn Speak and Rhyme.</li>
+  <li><strong>7 reading levels:</strong> Simple, Everyday, College and Expert, plus Max, Max ×10 and
+    Stupid for laughs.</li>
+  <li><strong>Text or email:</strong> short and natural for texts; greeting, paragraphs and sign-off
+    for emails.</li>
+</ul>
+
+<h2>Your choice of AI</h2>
+<ul>
+  <li><strong>On this phone:</strong> free, private and works offline after a one-time 2.6 GB download.</li>
+  <li><strong>Your own computer</strong> running Ollama, LM Studio or another compatible server.</li>
+  <li><strong>A cloud AI</strong> with your own API key: Claude, ChatGPT, Gemini, OpenRouter, Groq,
+    Mistral or DeepSeek. Several have free tiers.</li>
+</ul>
+
+<h2>Private by design</h2>
+<ul>
+  <li>Nothing is sent until you tap Rewrite, and then only to the AI you chose.</li>
+  <li>No account, no ads, no analytics.</li>
+  <li>The Rewrite button reads only the message box you're typing in, only in the apps above, and
+    never password boxes or messages you receive.</li>
+</ul>
+<p>Read the full <a href="privacy-policy.html">privacy policy</a>.</p>
+
+<h2>Help and feedback</h2>
+<p>Questions, problems or a rewrite that came out wrong: email <a href="mailto:rewordmessages@gmail.com">rewordmessages@gmail.com</a>. You can also tap
+Report in the rewrite panel to send us a rewrite.</p>
+
+<footer>
+  <a href="privacy-policy.html">Privacy policy</a>
+</footer>
+</main>
+</body>
+</html>
