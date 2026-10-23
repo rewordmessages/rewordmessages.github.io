@@ -31,22 +31,26 @@
   footer { margin-top: 3em; padding-top: 1em; border-top: 1px solid var(--card); color: var(--muted); font-size: 0.9em; }
   /* Picture viewer: opened by tapping a gallery picture. */
   .viewer { position: fixed; inset: 0; z-index: 10; display: none; flex-direction: column; align-items: center;
-            justify-content: center; background: rgba(0, 0, 0, 0.95); color: #fff; touch-action: pan-y; }
+            justify-content: center; background: rgba(0, 0, 0, 0.95); color: #fff; touch-action: manipulation; }
   .viewer.open { display: flex; }
-  .viewer img { max-width: min(92vw, 540px); max-height: 78vh; width: auto; height: auto; border-radius: 12px;
-                user-select: none; }
-  .viewer p { margin: 12px 16px 0; text-align: center; font-size: 0.95em; max-width: 540px; }
-  .viewer button { position: absolute; border: 0; border-radius: 999px; background: rgba(255, 255, 255, 0.18);
+  /* As big as the window allows, keeping the shape; the pictures are full size, so text stays sharp. */
+  .viewer img { max-width: calc(100vw - 160px); max-height: calc(100vh - 100px); max-height: calc(100dvh - 100px);
+                width: auto; height: auto; border-radius: 12px; user-select: none; }
+  .viewer p { margin: 10px 16px 0; text-align: center; font-size: 0.95em; max-width: 720px; }
+  .viewer button { position: absolute; border: 0; border-radius: 999px; background: rgba(60, 60, 60, 0.75);
                    color: #fff; font: inherit; font-size: 28px; line-height: 1; width: 52px; height: 52px; cursor: pointer; }
-  .viewer button:hover, .viewer button:focus-visible { background: rgba(255, 255, 255, 0.35); outline: none; }
+  .viewer button:hover, .viewer button:focus-visible { background: rgba(110, 110, 110, 0.9); outline: none; }
   .viewer .prev { left: 12px; top: 50%; transform: translateY(-50%); }
   .viewer .next { right: 12px; top: 50%; transform: translateY(-50%); }
   .viewer .close { right: 12px; top: 12px; font-size: 24px; }
-  .viewer .count { position: absolute; left: 16px; top: 24px; margin: 0; opacity: 0.8; }
+  .viewer .count { position: absolute; left: 16px; top: 24px; margin: 0; opacity: 0.8; z-index: 1; }
   @media (max-width: 600px) {
-    /* On a phone the buttons sit at the bottom, under the thumb, instead of over the picture. */
+    /* On a phone the picture gets nearly the whole screen; the buttons float over its bottom corners,
+       under the thumb, and the description is left to screen readers (it's the picture's alt text). */
     .viewer .prev, .viewer .next { top: auto; bottom: 16px; transform: none; }
-    .viewer img { max-height: 70vh; }
+    .viewer img { max-width: 100vw; max-height: calc(100vh - 16px); max-height: calc(100dvh - 16px); }
+    .viewer p:not(.count) { display: none; }
+    .viewer .count { top: 16px; padding: 4px 10px; border-radius: 999px; background: rgba(60, 60, 60, 0.75); opacity: 1; }
   }
 </style>
 </head>
@@ -76,17 +80,17 @@ and see the rewrite before it goes in.</p>
 
 <h2>See it in action</h2>
 <ul class="gallery">
-  <li><a href="screens/01-professional.webp?v=6ed19805"><img src="screens/01-professional.webp?v=6ed19805" alt="A messy text about being late to a meeting, rewritten as Professional at the Everyday reading level" width="540" height="1080" loading="lazy"></a></li>
-  <li><a href="screens/02-prosent.webp?v=e843730c"><img src="screens/02-prosent.webp?v=e843730c" alt="The professional rewrite after it was sent" width="540" height="1080" loading="lazy"></a></li>
-  <li><a href="screens/03-shakespeare.webp?v=6e9f095b"><img src="screens/03-shakespeare.webp?v=6e9f095b" alt="The same text rewritten as Shakespeare at the Max reading level" width="540" height="1080" loading="lazy"></a></li>
-  <li><a href="screens/04-pirate.webp?v=77b3df69"><img src="screens/04-pirate.webp?v=77b3df69" alt="A messy text about a night out, rewritten as Pirate at the Max reading level" width="540" height="1080" loading="lazy"></a></li>
-  <li><a href="screens/05-piratesent.webp?v=a60b5228"><img src="screens/05-piratesent.webp?v=a60b5228" alt="The pirate rewrite after it was sent" width="540" height="1080" loading="lazy"></a></li>
-  <li><a href="screens/06-lpbefore.webp?v=1fc9f4e4"><img src="screens/06-lpbefore.webp?v=1fc9f4e4" alt="Tapping the Reword button on a messy text about bringing home dinner" width="540" height="1080" loading="lazy"></a></li>
-  <li><a href="screens/07-lpafter.webp?v=08da3d29"><img src="screens/07-lpafter.webp?v=08da3d29" alt="The text reworded in place as a rhyme at the Expert reading level, with an Undo button" width="540" height="1080" loading="lazy"></a></li>
-  <li><a href="screens/08-setup.webp?v=0e014781"><img src="screens/08-setup.webp?v=0e014781" alt="Setup: choosing the free AI that runs on the phone, with its one-time download" width="540" height="1080" loading="lazy"></a></li>
-  <li><a href="screens/09-disclosure.webp?v=8eb06616"><img src="screens/09-disclosure.webp?v=8eb06616" alt="What the Reword button can see" width="540" height="1080" loading="lazy"></a></li>
-  <li><a href="screens/10-settings.webp?v=3a2fdeb3"><img src="screens/10-settings.webp?v=3a2fdeb3" alt="Settings: your default type, style and reading level" width="540" height="1080" loading="lazy"></a></li>
-  <li><a href="screens/11-extras.webp?v=f2a2109b"><img src="screens/11-extras.webp?v=f2a2109b" alt="Extras: the Reword keyboard, Quick Settings and the text-selection menu" width="540" height="1080" loading="lazy"></a></li>
+  <li><a href="screens/full/01-professional.webp?v=98508ad5"><img src="screens/01-professional.webp?v=6ed19805" alt="A messy text about being late to a meeting, rewritten as Professional at the Everyday reading level" width="540" height="1080" loading="lazy"></a></li>
+  <li><a href="screens/full/02-prosent.webp?v=ae19e53d"><img src="screens/02-prosent.webp?v=e843730c" alt="The professional rewrite after it was sent" width="540" height="1080" loading="lazy"></a></li>
+  <li><a href="screens/full/03-shakespeare.webp?v=27cc5981"><img src="screens/03-shakespeare.webp?v=6e9f095b" alt="The same text rewritten as Shakespeare at the Max reading level" width="540" height="1080" loading="lazy"></a></li>
+  <li><a href="screens/full/04-pirate.webp?v=a46a585f"><img src="screens/04-pirate.webp?v=77b3df69" alt="A messy text about a night out, rewritten as Pirate at the Max reading level" width="540" height="1080" loading="lazy"></a></li>
+  <li><a href="screens/full/05-piratesent.webp?v=105aed1c"><img src="screens/05-piratesent.webp?v=a60b5228" alt="The pirate rewrite after it was sent" width="540" height="1080" loading="lazy"></a></li>
+  <li><a href="screens/full/06-lpbefore.webp?v=71cc35d1"><img src="screens/06-lpbefore.webp?v=1fc9f4e4" alt="Tapping the Reword button on a messy text about bringing home dinner" width="540" height="1080" loading="lazy"></a></li>
+  <li><a href="screens/full/07-lpafter.webp?v=ed4eba2f"><img src="screens/07-lpafter.webp?v=08da3d29" alt="The text reworded in place as a rhyme at the Expert reading level, with an Undo button" width="540" height="1080" loading="lazy"></a></li>
+  <li><a href="screens/full/08-setup.webp?v=2d2c6104"><img src="screens/08-setup.webp?v=0e014781" alt="Setup: choosing the free AI that runs on the phone, with its one-time download" width="540" height="1080" loading="lazy"></a></li>
+  <li><a href="screens/full/09-disclosure.webp?v=445ebfd0"><img src="screens/09-disclosure.webp?v=8eb06616" alt="What the Reword button can see" width="540" height="1080" loading="lazy"></a></li>
+  <li><a href="screens/full/10-settings.webp?v=07e81d19"><img src="screens/10-settings.webp?v=3a2fdeb3" alt="Settings: your default type, style and reading level" width="540" height="1080" loading="lazy"></a></li>
+  <li><a href="screens/full/11-extras.webp?v=ed7d5053"><img src="screens/11-extras.webp?v=f2a2109b" alt="Extras: the Reword keyboard, Quick Settings and the text-selection menu" width="540" height="1080" loading="lazy"></a></li>
 </ul>
 
 <h2>Works where you type</h2>
@@ -186,10 +190,15 @@ Report in the rewrite panel to send us a rewrite.</p>
     else return;
     e.preventDefault();
   });
-  // A sideways swipe of 40 pixels or more turns the picture.
-  viewer.addEventListener("touchstart", function (e) { startX = e.touches[0].clientX; }, { passive: true });
+  // A one-finger sideways swipe of 40 pixels or more turns the picture. Two fingers pinch to zoom, and
+  // while zoomed in a swipe moves around the picture instead.
+  function zoomed() { return window.visualViewport ? window.visualViewport.scale > 1.05 : false; }
+  viewer.addEventListener("touchstart", function (e) {
+    startX = e.touches.length === 1 && !zoomed() ? e.touches[0].clientX : null;
+  }, { passive: true });
+  viewer.addEventListener("touchmove", function (e) { if (e.touches.length > 1) startX = null; }, { passive: true });
   viewer.addEventListener("touchend", function (e) {
-    if (startX === null) return;
+    if (startX === null || zoomed()) return;
     var dx = e.changedTouches[0].clientX - startX;
     startX = null;
     if (Math.abs(dx) >= 40) show(index + (dx < 0 ? 1 : -1));
