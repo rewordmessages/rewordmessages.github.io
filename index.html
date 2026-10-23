@@ -29,6 +29,25 @@
              margin: 1em 0 0; padding: 0; list-style: none; }
   .gallery img { display: block; width: 100%; height: auto; border-radius: 12px; }
   footer { margin-top: 3em; padding-top: 1em; border-top: 1px solid var(--card); color: var(--muted); font-size: 0.9em; }
+  /* Picture viewer: opened by tapping a gallery picture. */
+  .viewer { position: fixed; inset: 0; z-index: 10; display: none; flex-direction: column; align-items: center;
+            justify-content: center; background: rgba(0, 0, 0, 0.95); color: #fff; touch-action: pan-y; }
+  .viewer.open { display: flex; }
+  .viewer img { max-width: min(92vw, 540px); max-height: 78vh; width: auto; height: auto; border-radius: 12px;
+                user-select: none; }
+  .viewer p { margin: 12px 16px 0; text-align: center; font-size: 0.95em; max-width: 540px; }
+  .viewer button { position: absolute; border: 0; border-radius: 999px; background: rgba(255, 255, 255, 0.18);
+                   color: #fff; font: inherit; font-size: 28px; line-height: 1; width: 52px; height: 52px; cursor: pointer; }
+  .viewer button:hover, .viewer button:focus-visible { background: rgba(255, 255, 255, 0.35); outline: none; }
+  .viewer .prev { left: 12px; top: 50%; transform: translateY(-50%); }
+  .viewer .next { right: 12px; top: 50%; transform: translateY(-50%); }
+  .viewer .close { right: 12px; top: 12px; font-size: 24px; }
+  .viewer .count { position: absolute; left: 16px; top: 24px; margin: 0; opacity: 0.8; }
+  @media (max-width: 600px) {
+    /* On a phone the buttons sit at the bottom, under the thumb, instead of over the picture. */
+    .viewer .prev, .viewer .next { top: auto; bottom: 16px; transform: none; }
+    .viewer img { max-height: 70vh; }
+  }
 </style>
 </head>
 <body>
@@ -116,5 +135,72 @@ Report in the rewrite panel to send us a rewrite.</p>
   <a href="privacy-policy.html">Privacy policy</a>
 </footer>
 </main>
+
+<div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-label="Screenshots" hidden>
+  <p class="count" id="viewer-count"></p>
+  <img id="viewer-img" alt="">
+  <p id="viewer-caption"></p>
+  <button class="prev" id="viewer-prev" aria-label="Previous picture">&#8249;</button>
+  <button class="next" id="viewer-next" aria-label="Next picture">&#8250;</button>
+  <button class="close" id="viewer-close" aria-label="Close">&#10005;</button>
+</div>
+<script>
+// Gallery viewer: left/right buttons, arrow keys and swipes; Esc, the close button or the dark background close it.
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll(".gallery a"));
+  var viewer = document.getElementById("viewer");
+  var img = document.getElementById("viewer-img");
+  var caption = document.getElementById("viewer-caption");
+  var count = document.getElementById("viewer-count");
+  var index = 0, opener = null, startX = null;
+
+  function show(i) {
+    index = (i + links.length) % links.length;
+    var thumb = links[index].querySelector("img");
+    img.src = links[index].href;
+    img.alt = thumb.alt;
+    caption.textContent = thumb.alt;
+    count.textContent = (index + 1) + " / " + links.length;
+  }
+  function open(i) {
+    opener = links[i];
+    show(i);
+    viewer.hidden = false;
+    viewer.classList.add("open");
+    document.body.style.overflow = "hidden";
+    document.getElementById("viewer-next").focus();
+  }
+  function close() {
+    viewer.classList.remove("open");
+    viewer.hidden = true;
+    document.body.style.overflow = "";
+    if (opener) opener.focus();
+  }
+
+  links.forEach(function (link, i) {
+    link.addEventListener("click", function (e) { e.preventDefault(); open(i); });
+  });
+  document.getElementById("viewer-prev").addEventListener("click", function () { show(index - 1); });
+  document.getElementById("viewer-next").addEventListener("click", function () { show(index + 1); });
+  document.getElementById("viewer-close").addEventListener("click", close);
+  viewer.addEventListener("click", function (e) { if (e.target === viewer) close(); });
+  document.addEventListener("keydown", function (e) {
+    if (viewer.hidden) return;
+    if (e.key === "ArrowLeft") show(index - 1);
+    else if (e.key === "ArrowRight") show(index + 1);
+    else if (e.key === "Escape") close();
+    else return;
+    e.preventDefault();
+  });
+  // A sideways swipe of 40 pixels or more turns the picture.
+  viewer.addEventListener("touchstart", function (e) { startX = e.touches[0].clientX; }, { passive: true });
+  viewer.addEventListener("touchend", function (e) {
+    if (startX === null) return;
+    var dx = e.changedTouches[0].clientX - startX;
+    startX = null;
+    if (Math.abs(dx) >= 40) show(index + (dx < 0 ? 1 : -1));
+  });
+})();
+</script>
 </body>
 </html>
