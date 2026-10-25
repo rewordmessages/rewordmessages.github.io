@@ -34,7 +34,7 @@
   h3 { font-size: 1.05em; margin: 1.2em 0 .3em; }
   h3.sub { font-size: 1.1em; margin: 1.6em 0 .3em; color: var(--accent); }
   table.choice { width: 100%; border-collapse: separate; border-spacing: 8px; }
-  table.choice td { width: 33%; vertical-align: top; background: var(--card); border-radius: 10px; padding: 12px 14px; }
+  table.choice td { width: 50%; vertical-align: top; background: var(--card); border-radius: 10px; padding: 12px 14px; }
   @media (max-width: 600px) { table.choice, table.choice tbody, table.choice tr, table.choice td { display: block; width: auto; } }
   footer { margin-top: 3em; padding-top: 1em; border-top: 1px solid var(--card); color: var(--muted); font-size: 0.9em; }
 </style>
@@ -86,14 +86,15 @@ AI instead.</div>
 <p>Type <code>/bye</code> to leave.</p>
 
 <h2>Step 3: Choose how your phone will reach it</h2>
-<table class="choice"><tr>
-<td><strong>Option A: just me</strong><br>Easiest. Uses Tailscale (free). Nothing on your home network is opened to the internet.
+<table class="choice">
+<tr><td><strong>Option A: just me</strong><br>Easiest. Uses Tailscale (free). Nothing on your home network is opened to the internet.
 Each phone needs the Tailscale app.</td>
-<td><strong>Option B: me and other people</strong><br>Advanced. Uses a domain name, a free Let's Encrypt certificate and a separate key
+<td><strong>Option D: other people, with Tailscale</strong><br>Share your computer with each person through Tailscale. No domain and no router
+changes. Each person needs the free Tailscale app and their own Tailscale account.</td></tr>
+<tr><td><strong>Option B: me and other people</strong><br>Advanced. Uses a domain name, a free Let's Encrypt certificate and a separate key
 for each person. Needs router changes, and opens your home connection to the internet.</td>
 <td><strong>Option C: at home only</strong><br>Advanced. Works only while your phone is on your home Wi-Fi. Uses a free domain name and a free
-certificate, but no router changes and no Tailscale. Nothing is opened to the internet.</td>
-</tr></table>
+certificate, but no router changes and no Tailscale. Nothing is opened to the internet.</td></tr></table>
 <p>Pick one and follow only that part, then continue at Step 4. If you are not sure, choose A.</p>
 
 <h2 id="a">Option A: just me, with Tailscale</h2>
@@ -331,12 +332,45 @@ sudo systemctl status caddy</pre></div>
 <code>https://my-reword.duckdns.org</code> in the phone's browser. It should say <strong>Ollama is running</strong> with a padlock.
 With the phone on mobile data it should <strong>not</strong> connect. Then go on to Step 4.</p>
 
+<h2 id="d">Option D: other people, with Tailscale sharing</h2>
+<div class="warn"><strong>Read this first, and remember: do this at your own risk.</strong>
+<ul>
+  <li>Each person you share with can reach <strong>your whole computer over Tailscale</strong>, not only Ollama, unless you limit them
+    with Tailscale's access rules. Share only with people you trust, or use a spare computer for this.</li>
+  <li>Each person needs a Tailscale account of their own. The free plan has limits on users and devices; check
+    <a href="https://tailscale.com/pricing">Tailscale's current limits</a> before you invite people.</li>
+  <li>Do Option A first (A1 and A2). This option only adds the sharing.</li>
+</ul></div>
+
+<h3 class="sub">D1. Get Option A working for yourself</h3>
+<p>Follow Option A above until your own phone can open your <code>https://...ts.net</code> address and sees <strong>Ollama is running</strong>.</p>
+
+<h3 class="sub">D2. Share your computer with a person</h3>
+<ol>
+  <li>Open <a href="https://login.tailscale.com/admin/machines">login.tailscale.com/admin/machines</a>.</li>
+  <li>Find your computer, click the three dots at the end of its row and choose <strong>Share</strong>.</li>
+  <li>Create an invite link and send it to the person.</li>
+</ol>
+
+<h3 class="sub">D3. What the person does</h3>
+<ol>
+  <li>Install the <strong>Tailscale app</strong> on their phone (Google Play) and sign in with their own free account.</li>
+  <li>Open your invite link and accept it. Your computer now shows up for them.</li>
+  <li>Keep Tailscale turned on while using Reword.</li>
+  <li>Use your full address in Reword (the <code>https://...ts.net</code> one from Option A). They leave <strong>Server key</strong> empty.</li>
+</ol>
+<p>Then go on to Step 4. It should work the same way as for you, but I have not been able to test sharing across two accounts, so if the
+address does not load for them, check Tailscale's own sharing instructions.</p>
+
+<h3 class="sub">D4. Taking access away</h3>
+<p>In the same Machines page, open your computer's menu and remove the share for that person. They lose access at once.</p>
+
 <h2>Step 4: Connect Reword</h2>
 <ol>
   <li>Open Reword and go to step 1, <strong>Which AI should do the rewriting?</strong>, and choose <strong>My own server</strong>.</li>
   <li>In <strong>Server address</strong> put your address: the <code>https://...ts.net</code> one from Option A, or
-    <code>https://your-name.duckdns.org</code> from Option B, or <code>https://my-reword.duckdns.org</code> from Option C (no port).</li>
-  <li>In <strong>Server key</strong>: leave it empty for Option A and Option C; for Option B put the key you made for that person.</li>
+    <code>https://your-name.duckdns.org</code> from Option B, or <code>https://my-reword.duckdns.org</code> from Option C (no port). With Option D, people use your full <code>https://...ts.net</code> address.</li>
+  <li>In <strong>Server key</strong>: leave it empty for Options A, C and D; for Option B put the key you made for that person.</li>
   <li>Open <strong>Advanced</strong> and choose your model from the <strong>model</strong> pull-down (the one you downloaded).</li>
   <li>Tap <strong>Test</strong>. When it says Connected, you are done.</li>
 </ol>
@@ -347,6 +381,8 @@ With the phone on mobile data it should <strong>not</strong> connect. Then go on
   <li><strong>"Forbidden" or 403 (Option A):</strong> Ollama is still listening only to its own computer. Repeat A1 and restart Ollama.</li>
   <li><strong>Test cannot connect:</strong> Option A: check Tailscale is on in the phone app, the computer is awake, and the address matches
     <code>tailscale serve status</code> exactly. Option B: check Caddy is running and the key is right.</li>
+  <li><strong>Option D: the person cannot connect:</strong> check they accepted your invite, Tailscale is turned on in their phone app, and the address is
+    exactly the one from <code>tailscale serve status</code> on your computer.</li>
   <li><strong>Option C cannot connect:</strong> check the phone is on your home Wi-Fi, the computer is awake, the DuckDNS address still matches
     <code>ipconfig</code> or <code>hostname -I</code>, and your router's "DNS rebind protection" is not blocking the name.</li>
   <li><strong>Option B certificate "timeout" or "firewall":</strong> the router forward or your provider is blocking port 80 or 443.</li>
