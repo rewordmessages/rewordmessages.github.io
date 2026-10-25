@@ -34,7 +34,7 @@
   h3 { font-size: 1.05em; margin: 1.2em 0 .3em; }
   h3.sub { font-size: 1.1em; margin: 1.6em 0 .3em; color: var(--accent); }
   table.choice { width: 100%; border-collapse: separate; border-spacing: 8px; }
-  table.choice td { width: 50%; vertical-align: top; background: var(--card); border-radius: 10px; padding: 12px 14px; }
+  table.choice td { width: 33%; vertical-align: top; background: var(--card); border-radius: 10px; padding: 12px 14px; }
   @media (max-width: 600px) { table.choice, table.choice tbody, table.choice tr, table.choice td { display: block; width: auto; } }
   footer { margin-top: 3em; padding-top: 1em; border-top: 1px solid var(--card); color: var(--muted); font-size: 0.9em; }
 </style>
@@ -91,6 +91,8 @@ AI instead.</div>
 Each phone needs the Tailscale app.</td>
 <td><strong>Option B: me and other people</strong><br>Advanced. Uses a domain name, a free Let's Encrypt certificate and a separate key
 for each person. Needs router changes, and opens your home connection to the internet.</td>
+<td><strong>Option C: at home only</strong><br>Advanced. Works only while your phone is on your home Wi-Fi. Uses a free domain name and a free
+certificate, but no router changes and no Tailscale. Nothing is opened to the internet.</td>
 </tr></table>
 <p>Pick one and follow only that part, then continue at Step 4. If you are not sure, choose A.</p>
 
@@ -187,7 +189,7 @@ has which key.</p>
 <div class="os"><h3>Linux</h3>
 <pre>LC_ALL=C tr -dc 'abcdefghjkmnpqrstuvwxyz23456789' &lt; /dev/urandom | head -c 12; echo</pre></div>
 
-<h3 class="sub">B4. Install Caddy</h3>
+<h3 class="sub" id="b4">B4. Install Caddy</h3>
 <div class="os"><h3>Windows 11</h3>
 <pre>winget install CaddyServer.Caddy</pre>
 <p>Close and reopen Terminal afterwards.</p></div>
@@ -256,22 +258,97 @@ should see <strong>Not found</strong> and a padlock. That means it is protected.
 <pre>curl -H "Authorization: Bearer YOUR-KEY" https://your-name.duckdns.org/v1/models</pre></div>
 <p>It should list your models. Then go on to Step 4.</p>
 
+<h2 id="c">Option C: at home only, with a certificate</h2>
+<p>Reword from Google Play only accepts <code>https://</code>, and a phone only trusts a certificate for a domain name. So even at home
+you need a domain name. The trick: the name points to your computer's <strong>private home address</strong>, which only works when
+your phone is on your home Wi-Fi. Away from home the name leads nowhere, so Reword will not connect (that is what you asked for).</p>
+<div class="warn"><strong>Read this first, and remember: do this at your own risk.</strong>
+<ul>
+  <li>It only works on your home Wi-Fi. If you want it to work away from home too, use Option A.</li>
+  <li>A few routers block names that point to a private address ("DNS rebind protection"). If Step C5 fails for that reason, turn that
+    setting off in the router, or use Option A.</li>
+  <li>Your computer's home address must not change. In your router, look for "reserve this address" or "DHCP reservation" for your computer.</li>
+  <li>Here Ollama stays listening only to its own computer. <strong>Do not do Option A's step A1</strong>.</li>
+  <li>Anyone on your Wi-Fi who knows the name can use your AI. That is usually fine at home.</li>
+</ul></div>
+
+<h3 class="sub">C1. A free domain name with DuckDNS</h3>
+<ol>
+  <li>Go to <a href="https://www.duckdns.org">duckdns.org</a>, sign in, type a name (for example <code>my-reword</code>) and click <strong>add domain</strong>.
+    Copy your <strong>token</strong> from the top of the page. Treat it like a password.</li>
+  <li>Find your computer's home address:
+    <div class="os"><h3>Windows 11</h3><pre>ipconfig</pre><p>Look for <strong>IPv4 Address</strong>, for example <code>192.168.1.20</code>.</p></div>
+    <div class="os"><h3>Linux</h3><pre>hostname -I</pre><p>Use the first address, for example <code>192.168.1.20</code>.</p></div></li>
+  <li>On the DuckDNS page, put that address in the <strong>current ip</strong> box next to your name and click <strong>update ip</strong>.</li>
+</ol>
+
+<h3 class="sub">C2. Open the secure port on your computer</h3>
+<div class="os"><h3>Windows 11</h3>
+<p>In Terminal opened as administrator:</p>
+<pre>New-NetFirewallRule -DisplayName "Reword Caddy" -Direction Inbound -Protocol TCP -LocalPort 443 -Profile Private -Action Allow</pre></div>
+<div class="os"><h3>Linux</h3>
+<pre>sudo ufw allow 443/tcp</pre>
+<p>(Only if you use <code>ufw</code>.)</p></div>
+<p>Do <strong>not</strong> forward any ports on your router.</p>
+
+<h3 class="sub">C3. Install Caddy with the DuckDNS add-on</h3>
+<p>Install Caddy exactly as in <a href="#b4">B4 above</a>. Then add the DuckDNS add-on, which lets Caddy prove the name is yours without opening any port:</p>
+<div class="os"><h3>Windows 11 (Terminal as administrator)</h3>
+<pre>caddy add-package github.com/caddy-dns/duckdns</pre></div>
+<div class="os"><h3>Linux</h3>
+<pre>sudo caddy add-package github.com/caddy-dns/duckdns
+sudo systemctl restart caddy</pre></div>
+<p>If that command is not available, download a Caddy that includes the <code>duckdns</code> add-on from
+<a href="https://caddyserver.com/download">caddyserver.com/download</a> and use it in place of the one you installed.</p>
+
+<h3 class="sub">C4. The Caddy settings file</h3>
+<p>Make a file named <code>Caddyfile</code> with this text. Replace <code>my-reword</code> with your DuckDNS name and
+<code>YOUR-DUCKDNS-TOKEN</code> with your token.</p>
+<pre>my-reword.duckdns.org {
+	tls {
+		dns duckdns YOUR-DUCKDNS-TOKEN
+	}
+	reverse_proxy 127.0.0.1:11434 {
+		header_up Host 127.0.0.1:11434
+	}
+}</pre>
+<div class="os"><h3>Windows 11</h3>
+<pre>mkdir C:\caddy
+notepad C:\caddy\Caddyfile</pre>
+<p>Save with "All files" so it does not become <code>Caddyfile.txt</code>.</p></div>
+<div class="os"><h3>Linux</h3>
+<pre>sudo nano /etc/caddy/Caddyfile</pre>
+<p>Replace everything in the file with the text above, save (Ctrl+O, Enter) and exit (Ctrl+X).</p></div>
+
+<h3 class="sub">C5. Start Caddy and test</h3>
+<div class="os"><h3>Windows 11</h3>
+<pre>caddy run --config C:\caddy\Caddyfile</pre>
+<p>Leave the window open. Caddy stops when you close it.</p></div>
+<div class="os"><h3>Linux</h3>
+<pre>sudo systemctl restart caddy
+sudo systemctl status caddy</pre></div>
+<p>The first start takes a few seconds while Caddy gets the certificate. Then, with your phone on your <strong>home Wi-Fi</strong>, open
+<code>https://my-reword.duckdns.org</code> in the phone's browser. It should say <strong>Ollama is running</strong> with a padlock.
+With the phone on mobile data it should <strong>not</strong> connect. Then go on to Step 4.</p>
+
 <h2>Step 4: Connect Reword</h2>
 <ol>
   <li>Open Reword and go to step 1, <strong>Which AI should do the rewriting?</strong>, and choose <strong>My own server</strong>.</li>
   <li>In <strong>Server address</strong> put your address: the <code>https://...ts.net</code> one from Option A, or
-    <code>https://your-name.duckdns.org</code> from Option B (no port).</li>
-  <li>In <strong>Server key</strong>: leave it empty for Option A; for Option B put the key you made for that person.</li>
+    <code>https://your-name.duckdns.org</code> from Option B, or <code>https://my-reword.duckdns.org</code> from Option C (no port).</li>
+  <li>In <strong>Server key</strong>: leave it empty for Option A and Option C; for Option B put the key you made for that person.</li>
   <li>Open <strong>Advanced</strong> and choose your model from the <strong>model</strong> pull-down (the one you downloaded).</li>
   <li>Tap <strong>Test</strong>. When it says Connected, you are done.</li>
 </ol>
-<p>With Option A, Tailscale has to be turned on on the phone, also when you are at home.</p>
+<p>With Option A, Tailscale has to be turned on on the phone, also when you are at home. With Option C, Reword only works while the phone is on your home Wi-Fi.</p>
 
 <h2>If something goes wrong</h2>
 <ul>
   <li><strong>"Forbidden" or 403 (Option A):</strong> Ollama is still listening only to its own computer. Repeat A1 and restart Ollama.</li>
   <li><strong>Test cannot connect:</strong> Option A: check Tailscale is on in the phone app, the computer is awake, and the address matches
     <code>tailscale serve status</code> exactly. Option B: check Caddy is running and the key is right.</li>
+  <li><strong>Option C cannot connect:</strong> check the phone is on your home Wi-Fi, the computer is awake, the DuckDNS address still matches
+    <code>ipconfig</code> or <code>hostname -I</code>, and your router's "DNS rebind protection" is not blocking the name.</li>
   <li><strong>Option B certificate "timeout" or "firewall":</strong> the router forward or your provider is blocking port 80 or 443.</li>
   <li><strong>The model is missing from the pull-down:</strong> run <code>ollama list</code> on the computer to see what is installed.</li>
   <li><strong>The first rewrite is slow:</strong> the computer is loading the model. Later ones are faster. Ollama unloads the model after
