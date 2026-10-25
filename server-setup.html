@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Run your own AI at home - Reword</title>
-<meta name="description" content="Step by step: set up Ollama on your own Windows 11 or Linux computer and use it with Reword on your phone.">
+<title>Run your own AI server - Reword</title>
+<meta name="description" content="Step by step: set up Ollama on your own Windows 11 or Linux computer, with Tailscale or a free certificate and keys, and use it with Reword.">
 <link rel="icon" href="icon.png">
 <style>
   :root { --text: #1f2937; --muted: #4b5563; --bg: #ffffff; --card: #f3f4f6; --link: #1e5aa8; --accent: #1e5aa8; }
@@ -32,26 +32,29 @@
   .warn { border-left: 5px solid #d97706; background: var(--card); border-radius: 8px; padding: 10px 16px; margin: 1em 0; }
   .os { border-top: 1px solid var(--card); margin-top: 1.2em; padding-top: .2em; }
   h3 { font-size: 1.05em; margin: 1.2em 0 .3em; }
+  h3.sub { font-size: 1.1em; margin: 1.6em 0 .3em; color: var(--accent); }
+  table.choice { width: 100%; border-collapse: separate; border-spacing: 8px; }
+  table.choice td { width: 50%; vertical-align: top; background: var(--card); border-radius: 10px; padding: 12px 14px; }
+  @media (max-width: 600px) { table.choice, table.choice tbody, table.choice tr, table.choice td { display: block; width: auto; } }
   footer { margin-top: 3em; padding-top: 1em; border-top: 1px solid var(--card); color: var(--muted); font-size: 0.9em; }
 </style>
 </head>
 <body>
 <main>
 <p><a href="index.html">&larr; Reword</a></p>
-<h1>Run your own AI at home</h1>
-<p class="tagline">Use a model on your own computer with Reword. Your messages go from your phone to your computer and nowhere else.</p>
+<h1>Run your own AI server</h1>
+<p class="tagline">Use a model on your own computer with Reword, for yourself or for family and friends. Windows 11 and Linux.</p>
 
-<p>This guide uses <strong>Ollama</strong> (free software that runs AI models on your computer) and <strong>Tailscale</strong>
-(a free service that gives your computer a secure <code>https://</code> address your phone can reach, at home or away).
-Reword from Google Play only connects to servers over <code>https://</code>, so a plain address like
-<code>http://192.168.1.20:11434</code> will not work.</p>
+<p>This guide uses <strong>Ollama</strong> (free software that runs AI models on your computer). Your messages go from your phone
+to your computer and nowhere else. Reword from Google Play only connects to servers over <code>https://</code>, so a plain address
+like <code>http://192.168.1.20:11434</code> will not work; Step 3 gives you a secure address in one of two ways.</p>
 
 <div class="warn"><strong>Before you start</strong>
 <ul>
   <li><strong>Your computer must be on and awake</strong> whenever you use Reword with it. If it sleeps, Reword cannot reach it.</li>
   <li><strong>You need a reasonably modern computer.</strong> 16 GB of memory is a good start, and a graphics card helps a lot.
     Without one, answers can take many seconds.</li>
-  <li>This uses other people's software (Ollama and Tailscale). Their steps and menus change from time to time; if something
+  <li>This uses other people's software (Ollama, Tailscale, Caddy). Their steps and menus change from time to time; if something
     here does not match what you see, their own websites are the final word.</li>
 </ul></div>
 
@@ -76,7 +79,17 @@ Reword from Google Play only connects to servers over <code>https://</code>, so 
 <pre>ollama run gemma4:e4b "Say hello in five words"</pre>
 <p>Type <code>/bye</code> to leave.</p>
 
-<h2>Step 3: Let Tailscale reach Ollama</h2>
+<h2>Step 3: Choose how your phone will reach it</h2>
+<table class="choice"><tr>
+<td><strong>Option A: just me</strong><br>Easiest. Uses Tailscale (free). Nothing on your home network is opened to the internet.
+Each phone needs the Tailscale app.</td>
+<td><strong>Option B: me and other people</strong><br>Advanced. Uses a domain name, a free Let's Encrypt certificate and a separate key
+for each person. Needs router changes, and opens your home connection to the internet.</td>
+</tr></table>
+<p>Pick one and follow only that part, then continue at Step 4. If you are not sure, choose A.</p>
+
+<h2 id="a">Option A: just me, with Tailscale</h2>
+<h3 class="sub">A1. Let Tailscale reach Ollama</h3>
 <p>By default Ollama listens only to its own computer and refuses requests that arrive under another name, which is how
 Tailscale delivers them. So we tell Ollama to listen on all of the computer's network addresses.</p>
 <div class="warn"><strong>Warning:</strong> after this step, <strong>anyone on your home network (and anyone you let onto your
@@ -94,7 +107,7 @@ printf '[Service]\nEnvironment="OLLAMA_HOST=0.0.0.0:11434"\n' | sudo tee /etc/sy
 sudo systemctl daemon-reload
 sudo systemctl restart ollama</pre></div>
 
-<h2>Step 4: Install Tailscale and give it an https address</h2>
+<h3 class="sub">A2. Install Tailscale and get an https address</h3>
 <ol>
   <li>Make a free account at <a href="https://login.tailscale.com/start">tailscale.com</a> if you do not have one.</li>
   <li>Install Tailscale on your computer and sign in:
@@ -126,33 +139,158 @@ sudo tailscale up</pre>
 <div class="warn"><strong>Note:</strong> the names of Tailscale devices can end up in public certificate records. Give your
 computer a name you do not mind being public.</div>
 
-<h2>Step 5: Connect Reword</h2>
+<p>Check it from your phone: with Tailscale turned on, open that address in the phone's browser. It should say
+<strong>Ollama is running</strong>. Then go on to Step 4.</p>
+<div class="warn"><strong>Note:</strong> the names of Tailscale devices can end up in public certificate records. Give your
+computer a name you do not mind being public.</div>
+
+<h2 id="b">Option B: me and other people, with a certificate and keys</h2>
+<div class="warn"><strong>Read this first</strong>
+<ul>
+  <li><strong>This opens your home internet connection to the internet.</strong> The keys are passwords: anyone who has one can use
+    your computer's AI until you remove it. There is no limit on how much each key can use, so give keys only to people you trust.</li>
+  <li>You need a <strong>domain name</strong> that points at your home internet address (a free one from
+    <a href="https://www.duckdns.org">duckdns.org</a> works), and you must be able to <strong>forward ports 80 and 443</strong>
+    on your router. <strong>Some internet providers block those ports.</strong> If yours does, the certificate step fails; use Option A.</li>
+  <li>Here Ollama stays listening only to its own computer, which is safer than Option A.
+    <strong>Do not do Option A's step A1</strong> if you choose this option.</li>
+</ul></div>
+<h3 class="sub">B1. A domain name that points to your home</h3>
+<p>Your domain's address record (an "A record") must hold your home's public internet address. Find it by searching the web for
+"what is my IP". If your provider changes it from time to time, use a service that updates it for you
+(duckdns.org has instructions). Then check it from your computer, replacing the example name with yours:</p>
+<div class="os"><h3>Windows 11</h3><pre>nslookup your-name.duckdns.org</pre></div>
+<div class="os"><h3>Linux</h3><pre>getent hosts your-name.duckdns.org</pre></div>
+<p>The address it shows must be your home's public address.</p>
+
+<h3 class="sub">B2. Open the ports</h3>
+<p>In your router's settings (often called Port Forwarding), forward <strong>TCP port 80</strong> and <strong>TCP port 443</strong>
+to your computer. Port 80 is only used by Let's Encrypt to check the domain is yours. In your computer's firewall:</p>
+<div class="os"><h3>Windows 11</h3>
+<p>In Terminal opened as administrator (right-click Terminal, Run as administrator):</p>
+<pre>New-NetFirewallRule -DisplayName "Reword Caddy" -Direction Inbound -Protocol TCP -LocalPort 80,443 -Action Allow</pre></div>
+<div class="os"><h3>Linux</h3>
+<pre>sudo ufw allow 80,443/tcp</pre>
+<p>(Only if you use <code>ufw</code>. If the command is not found, you have no ufw firewall to change.)</p></div>
+
+<h3 class="sub">B3. Make a key for each person</h3>
+<p>Run this once for each person. It prints a 12-character key with no look-alike letters, easy to type on a phone. Write down who
+has which key.</p>
+<div class="os"><h3>Windows 11 (Terminal)</h3>
+<pre>-join (1..12 | % { 'abcdefghjkmnpqrstuvwxyz23456789'[[System.Security.Cryptography.RandomNumberGenerator]::GetInt32(31)] })</pre></div>
+<div class="os"><h3>Linux</h3>
+<pre>LC_ALL=C tr -dc 'abcdefghjkmnpqrstuvwxyz23456789' &lt; /dev/urandom | head -c 12; echo</pre></div>
+
+<h3 class="sub">B4. Install Caddy</h3>
+<div class="os"><h3>Windows 11</h3>
+<pre>winget install CaddyServer.Caddy</pre>
+<p>Close and reopen Terminal afterwards.</p></div>
+<div class="os"><h3>Linux (Debian and Ubuntu)</h3>
+<pre>sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+sudo apt update
+sudo apt install caddy</pre>
+<p>Other Linux systems: see <a href="https://caddyserver.com/docs/install">caddyserver.com/docs/install</a>.</p></div>
+
+<h3 class="sub">B5. The Caddy settings file</h3>
+<p>Make a file named <code>Caddyfile</code> with the text below. Replace <code>your-name.duckdns.org</code> with your domain, and put
+one <code>header</code> line in for each person's key (the example shows two people). One line per person is how you add or remove
+people later.</p>
+<pre>your-name.duckdns.org {
+	request_body {
+		max_size 64KB
+	}
+
+	@allowed {
+		header Authorization "Bearer PUT-FIRST-KEY-HERE"
+		header Authorization "Bearer PUT-SECOND-KEY-HERE"
+		method GET POST
+		path /v1/chat/completions /v1/models
+	}
+
+	handle @allowed {
+		reverse_proxy 127.0.0.1:11434 {
+			header_up Host 127.0.0.1:11434
+		}
+	}
+
+	handle {
+		respond "Not found" 404
+	}
+}</pre>
+<p>What it does: only people with a listed key get through, and only to the two things Reword needs. Everyone else gets "Not found".
+The <code>header_up Host</code> line is needed because Ollama refuses requests that arrive under another name.</p>
+<div class="os"><h3>Windows 11</h3>
+<p>Make a folder, open Notepad to create the file in it, and save it as <code>C:\caddy\Caddyfile</code> (choose "All files" so it does
+not become <code>Caddyfile.txt</code>):</p>
+<pre>mkdir C:\caddy
+notepad C:\caddy\Caddyfile</pre></div>
+<div class="os"><h3>Linux</h3>
+<pre>sudo nano /etc/caddy/Caddyfile</pre>
+<p>Replace everything in the file with the text above, save (Ctrl+O, Enter) and exit (Ctrl+X).</p></div>
+
+<h3 class="sub">B6. Start Caddy</h3>
+<div class="os"><h3>Windows 11</h3>
+<pre>caddy run --config C:\caddy\Caddyfile</pre>
+<p>Leave that window open. Caddy stops when you close it. To start it automatically with Windows, see Caddy's
+<a href="https://caddyserver.com/docs/running#windows-service">Windows service</a> instructions.</p></div>
+<div class="os"><h3>Linux</h3>
+<pre>sudo systemctl restart caddy
+sudo systemctl status caddy</pre></div>
+<p>The first start gets your certificate, which takes a few seconds. If it complains about "timeout" or "firewall", the router
+forward or your provider is blocking port 80 or 443.</p>
+
+<h3 class="sub">B7. Test it</h3>
+<p>From a computer or a phone on mobile data (not your Wi-Fi), open <code>https://your-name.duckdns.org/v1/models</code> in a browser. You
+should see <strong>Not found</strong> and a padlock. That means it is protected. Now check a key works (replace both names):</p>
+<div class="os"><h3>Windows 11</h3>
+<pre>curl.exe -H "Authorization: Bearer YOUR-KEY" https://your-name.duckdns.org/v1/models</pre></div>
+<div class="os"><h3>Linux</h3>
+<pre>curl -H "Authorization: Bearer YOUR-KEY" https://your-name.duckdns.org/v1/models</pre></div>
+<p>It should list your models. Then go on to Step 4.</p>
+
+<h2>Step 4: Connect Reword</h2>
 <ol>
   <li>Open Reword and go to step 1, <strong>Which AI should do the rewriting?</strong>, and choose <strong>My own server</strong>.</li>
-  <li>Paste your address (the <code>https://...ts.net</code> one) into <strong>Server address</strong>. Leave <strong>Server key</strong> empty.</li>
+  <li>In <strong>Server address</strong> put your address: the <code>https://...ts.net</code> one from Option A, or
+    <code>https://your-name.duckdns.org</code> from Option B (no port).</li>
+  <li>In <strong>Server key</strong>: leave it empty for Option A; for Option B put the key you made for that person.</li>
   <li>Open <strong>Advanced</strong> and choose your model from the <strong>model</strong> pull-down (the one you downloaded).</li>
   <li>Tap <strong>Test</strong>. When it says Connected, you are done.</li>
 </ol>
-<p>Tailscale has to be turned on on the phone, also when you are at home.</p>
+<p>With Option A, Tailscale has to be turned on on the phone, also when you are at home.</p>
 
 <h2>If something goes wrong</h2>
 <ul>
-  <li><strong>"Forbidden" or 403:</strong> Ollama is still listening only to its own computer. Repeat Step 3 and restart Ollama.</li>
-  <li><strong>Test cannot connect:</strong> check Tailscale is on in the phone app, the computer is awake, and the address matches
-    <code>tailscale serve status</code> exactly.</li>
+  <li><strong>"Forbidden" or 403 (Option A):</strong> Ollama is still listening only to its own computer. Repeat A1 and restart Ollama.</li>
+  <li><strong>Test cannot connect:</strong> Option A: check Tailscale is on in the phone app, the computer is awake, and the address matches
+    <code>tailscale serve status</code> exactly. Option B: check Caddy is running and the key is right.</li>
+  <li><strong>Option B certificate "timeout" or "firewall":</strong> the router forward or your provider is blocking port 80 or 443.</li>
   <li><strong>The model is missing from the pull-down:</strong> run <code>ollama list</code> on the computer to see what is installed.</li>
   <li><strong>The first rewrite is slow:</strong> the computer is loading the model. Later ones are faster. Ollama unloads the model after
     a few idle minutes by default.</li>
   <li><strong>Too slow overall:</strong> choose a smaller model in Step 2.</li>
 </ul>
 
-<h2>Stopping it</h2>
+<h2>Managing it later</h2>
+<h3 class="sub">Option B: adding and removing people</h3>
+<ul>
+  <li><strong>Add:</strong> make a key (Step 4), add a <code>header Authorization "Bearer KEY"</code> line to the Caddyfile, and reload:
+    <div class="os"><h3>Windows 11</h3><pre>caddy reload --config C:\caddy\Caddyfile</pre></div>
+    <div class="os"><h3>Linux</h3><pre>sudo systemctl reload caddy</pre></div></li>
+  <li><strong>Remove:</strong> delete that person's line and reload. Their key stops working at once, and nobody else is affected.</li>
+</ul>
+<p>On Windows, <code>caddy reload</code> may report that the admin endpoint is unavailable if you did not start Caddy with the same
+settings; in that case close the Caddy window and run B6 again.</p>
+
+<h3 class="sub">Option A: stopping it</h3>
 <p>To stop sharing with your phone: <code>tailscale serve reset</code> (on Linux, with <code>sudo</code>). To make Ollama listen only on
-its own computer again, undo Step 3.</p>
+its own computer again, undo A1.</p>
 
 <footer>
   <a href="index.html">Reword</a> &middot; <a href="privacy-policy.html">Privacy policy</a>
-  &middot; Ollama and Tailscale are separate products that Reword does not make or control.
+  &middot; Ollama, Tailscale, Caddy and Let's Encrypt are separate products that Reword does not make or control.
 </footer>
 </main>
 <script>
