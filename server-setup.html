@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Run your own AI at home - Reword</title>
+<meta name="description" content="Step by step: set up Ollama on your own Windows 11 or Linux computer and use it with Reword on your phone.">
+<link rel="icon" href="icon.png">
+<style>
+  :root { --text: #1f2937; --muted: #4b5563; --bg: #ffffff; --card: #f3f4f6; --link: #1e5aa8; --accent: #1e5aa8; }
+  @media (prefers-color-scheme: dark) {
+    :root { --text: #e5e7eb; --muted: #9ca3af; --bg: #111827; --card: #1f2937; --link: #93c5fd; --accent: #3b82f6; }
+  }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 720px; margin: 0 auto; padding: 32px 16px 64px; }
+  header { display: flex; align-items: center; gap: 16px; }
+  header img { width: 72px; height: 72px; border-radius: 16px; flex: none; }
+  h1 { font-size: 1.8em; margin: 0; line-height: 1.2; }
+  .tagline { color: var(--muted); margin: 4px 0 0; }
+  h2 { font-size: 1.2em; margin-top: 2em; }
+  a { color: var(--link); }
+  li { margin: 0.3em 0; }
+  .steps { background: var(--card); border-radius: 12px; padding: 16px 20px; }
+  .steps ol { margin: 0; padding-left: 1.2em; }
+  .button { display: inline-block; background: var(--accent); color: #fff; padding: 2px 10px;
+            border-radius: 999px; font-size: 0.9em; white-space: nowrap; }
+  pre { position: relative; background: var(--card); border-radius: 10px; padding: 12px 70px 12px 14px; overflow-x: auto;
+        font: 14px/1.5 ui-monospace, SFMono-Regular, Consolas, Menlo, monospace; white-space: pre-wrap; word-break: break-word; }
+  pre button { position: absolute; top: 8px; right: 8px; border: 0; border-radius: 8px; background: var(--accent); color: #fff;
+               font: inherit; font-size: 13px; padding: 4px 10px; cursor: pointer; }
+  .warn { border-left: 5px solid #d97706; background: var(--card); border-radius: 8px; padding: 10px 16px; margin: 1em 0; }
+  .os { border-top: 1px solid var(--card); margin-top: 1.2em; padding-top: .2em; }
+  h3 { font-size: 1.05em; margin: 1.2em 0 .3em; }
+  footer { margin-top: 3em; padding-top: 1em; border-top: 1px solid var(--card); color: var(--muted); font-size: 0.9em; }
+</style>
+</head>
+<body>
+<main>
+<p><a href="index.html">&larr; Reword</a></p>
+<h1>Run your own AI at home</h1>
+<p class="tagline">Use a model on your own computer with Reword. Your messages go from your phone to your computer and nowhere else.</p>
+
+<p>This guide uses <strong>Ollama</strong> (free software that runs AI models on your computer) and <strong>Tailscale</strong>
+(a free service that gives your computer a secure <code>https://</code> address your phone can reach, at home or away).
+Reword from Google Play only connects to servers over <code>https://</code>, so a plain address like
+<code>http://192.168.1.20:11434</code> will not work.</p>
+
+<div class="warn"><strong>Before you start</strong>
+<ul>
+  <li><strong>Your computer must be on and awake</strong> whenever you use Reword with it. If it sleeps, Reword cannot reach it.</li>
+  <li><strong>You need a reasonably modern computer.</strong> 16 GB of memory is a good start, and a graphics card helps a lot.
+    Without one, answers can take many seconds.</li>
+  <li>This uses other people's software (Ollama and Tailscale). Their steps and menus change from time to time; if something
+    here does not match what you see, their own websites are the final word.</li>
+</ul></div>
+
+<h2>Step 1: Install Ollama</h2>
+<div class="os"><h3>Windows 11</h3>
+<p>Open <strong>Windows Terminal</strong> (right-click Start, then Terminal) and paste:</p>
+<pre>winget install Ollama.Ollama</pre>
+<p>No winget? Download the installer from <a href="https://ollama.com/download/windows">ollama.com/download/windows</a>.</p></div>
+<div class="os"><h3>Linux</h3>
+<pre>curl -fsSL https://ollama.com/install.sh | sh</pre></div>
+
+<h2>Step 2: Download a model</h2>
+<p>Pick one that fits your computer. The download is large, so use a fast connection.</p>
+<ul>
+  <li><strong>Modest computer</strong> (8 GB of memory, no graphics card): <code>gemma4:e2b</code> (about 4.6 GB)</li>
+  <li><strong>Most computers</strong> (16 GB of memory or a mid-range graphics card): <code>gemma4:e4b</code> (about 6.6 GB)</li>
+  <li><strong>Strong graphics card</strong> (12 GB of video memory or more): <code>gemma4:12b</code> (about 8 GB)</li>
+</ul>
+<p>Paste this, using the name you picked (this one is the middle choice), in Terminal on Windows or in a Linux terminal:</p>
+<pre>ollama pull gemma4:e4b</pre>
+<p>Check that it answers:</p>
+<pre>ollama run gemma4:e4b "Say hello in five words"</pre>
+<p>Type <code>/bye</code> to leave.</p>
+
+<h2>Step 3: Let Tailscale reach Ollama</h2>
+<p>By default Ollama listens only to its own computer and refuses requests that arrive under another name, which is how
+Tailscale delivers them. So we tell Ollama to listen on all of the computer's network addresses.</p>
+<div class="warn"><strong>Warning:</strong> after this step, <strong>anyone on your home network (and anyone you let onto your
+Wi-Fi) can use your Ollama</strong>. It has no password. That is usually fine at home. <strong>Never</strong> forward a port
+on your router to it and never put it on the internet.</div>
+<div class="os"><h3>Windows 11</h3>
+<p>In Terminal:</p>
+<pre>setx OLLAMA_HOST "0.0.0.0:11434"</pre>
+<p>Then right-click the Ollama icon near the clock (you may need the little arrow to see it), choose <strong>Quit Ollama</strong>,
+and start Ollama again from the Start menu. If Windows asks whether to allow Ollama through the firewall, allow it on
+<strong>Private networks</strong> only.</p></div>
+<div class="os"><h3>Linux</h3>
+<pre>sudo mkdir -p /etc/systemd/system/ollama.service.d
+printf '[Service]\nEnvironment="OLLAMA_HOST=0.0.0.0:11434"\n' | sudo tee /etc/systemd/system/ollama.service.d/reword.conf
+sudo systemctl daemon-reload
+sudo systemctl restart ollama</pre></div>
+
+<h2>Step 4: Install Tailscale and give it an https address</h2>
+<ol>
+  <li>Make a free account at <a href="https://login.tailscale.com/start">tailscale.com</a> if you do not have one.</li>
+  <li>Install Tailscale on your computer and sign in:
+    <div class="os"><h3>Windows 11</h3>
+    <pre>winget install Tailscale.Tailscale</pre>
+    <p>Then open Tailscale from the Start menu and sign in. <strong>Close and reopen Terminal</strong> afterwards.</p></div>
+    <div class="os"><h3>Linux</h3>
+    <pre>curl -fsSL https://tailscale.com/install.sh | sh
+sudo tailscale up</pre>
+    <p>Open the link it prints and sign in.</p></div>
+  </li>
+  <li>Install the <strong>Tailscale app on your phone</strong> (Google Play), sign in with the <strong>same account</strong> and
+    turn it on.</li>
+  <li>Open <a href="https://login.tailscale.com/admin/dns">login.tailscale.com/admin/dns</a>, find
+    <strong>HTTPS Certificates</strong> and click <strong>Enable HTTPS</strong>.</li>
+  <li>On your computer, give Ollama its https address:
+    <div class="os"><h3>Windows 11</h3>
+    <pre>tailscale serve --bg 11434</pre></div>
+    <div class="os"><h3>Linux</h3>
+    <pre>sudo tailscale serve --bg 11434</pre></div>
+    If it prints a link asking you to enable something, open it, approve, and run the command again.</li>
+  <li>See your address:
+    <div class="os"><h3>Windows 11</h3><pre>tailscale serve status</pre></div>
+    <div class="os"><h3>Linux</h3><pre>sudo tailscale serve status</pre></div>
+    It looks like <code>https://my-computer.tail1234.ts.net</code>. Copy it.</li>
+</ol>
+<p>Check it from your phone: with Tailscale turned on, open that address in the phone's browser. It should say
+<strong>Ollama is running</strong>.</p>
+<div class="warn"><strong>Note:</strong> the names of Tailscale devices can end up in public certificate records. Give your
+computer a name you do not mind being public.</div>
+
+<h2>Step 5: Connect Reword</h2>
+<ol>
+  <li>Open Reword and go to step 1, <strong>Which AI should do the rewriting?</strong>, and choose <strong>My own server</strong>.</li>
+  <li>Paste your address (the <code>https://...ts.net</code> one) into <strong>Server address</strong>. Leave <strong>Server key</strong> empty.</li>
+  <li>Open <strong>Advanced</strong> and choose your model from the <strong>model</strong> pull-down (the one you downloaded).</li>
+  <li>Tap <strong>Test</strong>. When it says Connected, you are done.</li>
+</ol>
+<p>Tailscale has to be turned on on the phone, also when you are at home.</p>
+
+<h2>If something goes wrong</h2>
+<ul>
+  <li><strong>"Forbidden" or 403:</strong> Ollama is still listening only to its own computer. Repeat Step 3 and restart Ollama.</li>
+  <li><strong>Test cannot connect:</strong> check Tailscale is on in the phone app, the computer is awake, and the address matches
+    <code>tailscale serve status</code> exactly.</li>
+  <li><strong>The model is missing from the pull-down:</strong> run <code>ollama list</code> on the computer to see what is installed.</li>
+  <li><strong>The first rewrite is slow:</strong> the computer is loading the model. Later ones are faster. Ollama unloads the model after
+    a few idle minutes by default.</li>
+  <li><strong>Too slow overall:</strong> choose a smaller model in Step 2.</li>
+</ul>
+
+<h2>Stopping it</h2>
+<p>To stop sharing with your phone: <code>tailscale serve reset</code> (on Linux, with <code>sudo</code>). To make Ollama listen only on
+its own computer again, undo Step 3.</p>
+
+<footer>
+  <a href="index.html">Reword</a> &middot; <a href="privacy-policy.html">Privacy policy</a>
+  &middot; Ollama and Tailscale are separate products that Reword does not make or control.
+</footer>
+</main>
+<script>
+document.querySelectorAll("pre").forEach(function (pre) {
+  var b = document.createElement("button");
+  b.type = "button"; b.textContent = "Copy";
+  b.addEventListener("click", function () {
+    var text = pre.firstChild.textContent;
+    (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(function () {
+      b.textContent = "Copied"; setTimeout(function () { b.textContent = "Copy"; }, 1500);
+    }, function () {
+      var r = document.createRange(); r.selectNodeContents(pre.firstChild); var s = getSelection(); s.removeAllRanges(); s.addRange(r);
+      b.textContent = "Press Ctrl+C"; setTimeout(function () { b.textContent = "Copy"; }, 2500);
+    });
+  });
+  pre.appendChild(b);
+});
+</script>
+</body>
+</html>
