@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Reword</title>
-<meta name="description" content="An Android app that rewrites your texts and emails in one tap, in the style and reading level you choose.">
+<meta name="description" content="An Android app that rewrites your texts and emails in one tap, in the style, reading level and language you choose.">
 <link rel="icon" href="icon.png">
 <style>
   :root { --text: #1f2937; --muted: #4b5563; --bg: #ffffff; --card: #f3f4f6; --link: #1e5aa8; --accent: #1e5aa8; }
@@ -26,6 +26,7 @@
   .example { background: var(--card); border-radius: 12px; padding: 4px 20px 12px; margin: 1em 0; }
   .example p { margin: 0.8em 0 0; }
   .example .label { display: block; color: var(--muted); font-size: 0.85em; font-weight: 600; }
+  .example .meaning { display: block; color: var(--muted); font-size: 0.9em; font-style: italic; }
   .button { display: inline-block; background: var(--accent); color: #fff; padding: 2px 10px;
             border-radius: 999px; font-size: 0.9em; white-space: nowrap; }
   .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px;
@@ -67,7 +68,7 @@
   </div>
 </header>
 
-<p>Reword is an Android app that uses AI, running right on your phone, computer or cloud AI of your choice, to help turn your messages into the style you pick. Choose from many distinct styles—from professional and concise to fun personas like Pirate, Shakespeare, and Gen Z—or adjust the reading level from Simple to Expert. Whether you’re polishing a business email or just trying to sound like a 17th-century poet, Reword has a tone for it. Type or use
+<p>Reword is an Android app that uses AI, running right on your phone, computer or cloud AI of your choice, to help turn your messages into the style you pick. Choose from many distinct styles—from professional and concise to fun personas like Pirate, Shakespeare, and Gen Z—adjust the reading level from Simple to Expert, or have it written in another language. Whether you’re polishing a business email or just trying to sound like a 17th-century poet, Reword has a tone for it. Type or use
 voice to text like you always do, then tap <span class="button">✎ Reword</span> above the message box.
 Your message is cleaned up right where you typed it.</p>
 
@@ -80,6 +81,21 @@ Everyday reading level:</p>
 <p><span class="label">Friendly style · Everyday reading level</span>Could you please let me know why the report isn’t finished yet? It was due on Monday, and I’m getting a bit concerned about the delay.</p>
 <p><span class="label">Professional style · Everyday reading level</span>Could you please explain why the report is still incomplete? It was expected by Monday, and the delay is becoming a significant issue.</p>
 <p><span class="label">Pirate style · Everyday reading level</span>Why be the report STILL not finished?? It was due Monday. This be gettin’ ridiculous, savvy?</p>
+</div>
+
+<h2>Write it in another language</h2>
+<p>Reword can also write your message in one of 16 languages: Arabic, Chinese, Dutch, English, French, German,
+Hindi, Italian, Japanese, Korean, Polish, Portuguese, Russian, Spanish, Turkish and Vietnamese. Type the way you
+always do, pick a language, and Reword translates your message first, then writes it in your style and reading
+level, so it sounds like a native speaker wrote it and the style is made in that language too. Names, numbers and
+times stay as you wrote them. Translating is part of Reword Pro.</p>
+
+<div class="example">
+<p><span class="label">You typed</span>running late, be there at 3:30. can you pick up the kids from school?</p>
+<p><span class="label">Spanish · Friendly style · Everyday reading level</span>Voy un poco tarde y estaré ahí a las 3:30. ¿Podrías pasar a buscar a los niños por la escuela?
+<span class="meaning">I’m running a little late and I’ll be there at 3:30. Could you pick up the kids from school?</span></p>
+<p><span class="label">German · Professional style · Everyday reading level</span>Ich komme etwas später und werde um 3:30 Uhr ankommen. Könntest du die Kinder bitte von der Schule abholen?
+<span class="meaning">I’m coming a bit later and will arrive at 3:30. Could you please pick the children up from school?</span></p>
 </div>
 
 <p><strong>Reword is free to download and use.</strong> An optional one-time purchase, Reword Pro, unlocks 87 more
