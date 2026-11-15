@@ -24,15 +24,15 @@
 <main>
 <p><a href="./">← Reword</a></p>
 <h1>Reword Privacy Policy</h1>
-<p class="date">Effective October 24, 2026</p>
+<p class="date">Effective November 15, 2026</p>
 
 <p>Reword is an Android app that rewrites the messages and emails you type, in the style and
 reading level you choose, using an AI service that you pick. It is made by Brian Vogel
 ("we"). This policy explains what the app does with your information.</p>
 
-<p><strong>In short:</strong> we don't have servers that receive your messages, and we don't collect, sell
-or share them. The text you ask to rewrite goes only to the AI you chose, only when you ask. There
-are no accounts, ads or analytics.</p>
+<p><strong>In short:</strong> the text you ask to rewrite goes only to the AI you chose, only when you ask.
+If you choose the Reword AI servers, it goes to our servers to be rewritten and is not kept there. We don't
+sell or share your messages, and we don't use them to train AI. There are no accounts, ads or analytics.</p>
 
 <h2>The text you rewrite</h2>
 <p>When you use Reword (the floating button, the Reword keyboard, the Quick Settings tile or the
@@ -42,6 +42,10 @@ message box, and you can undo it for a few seconds; a long press, and the other 
 result first. Nothing is sent until you ask.</p>
 <p>Where it goes depends on your choice:</p>
 <ul>
+  <li><strong>Reword AI servers</strong> (for subscribers): the text is sent over an encrypted connection to
+    servers that we run, rewritten by an AI model there, and the result is sent back to your phone. We don't
+    save your text or the rewrite to disk or to any log. The servers hold them in memory only while they work on
+    your request, and that memory is reused for later requests. No other company receives your text.</li>
   <li><strong>On this phone:</strong> the text is rewritten by an AI model on your phone and never leaves it.</li>
   <li><strong>My own server:</strong> the text goes to the server address you entered, such as a computer you
     run. We have no access to it.</li>
@@ -53,6 +57,17 @@ result first. Nothing is sent until you ask.</p>
 </ul>
 <p>The app doesn't keep a history of your messages or rewrites. A rewrite only replaces the text in
 your message box, or is copied to your clipboard if you choose Copy. You decide whether to send it.</p>
+
+<h2>What the Reword AI servers keep</h2>
+<p>When you use the Reword AI servers, our servers keep, for a short time, a standard connection log: your IP
+address, the time, the kind of request, the style settings you chose (such as Pirate or a haiku), whether it worked
+and how long it took. The log never contains the text you rewrite or the rewrite itself, and your server key is
+removed from it. The log is replaced as it grows, so it holds only the most recent requests. We use it only to keep
+the servers working and to stop abuse.</p>
+<p>To check a subscription, the app sends our servers the purchase code that Google Play gives it. Our servers ask
+Google Play whether that purchase is active, and send the app a server key. We store only a scrambled (hashed) copy
+of the purchase code and of the key, when the key ends, and how many rewrites were done today (for the daily
+limit). We never receive your name, email address or payment details.</p>
 
 <h2>The Reword button (accessibility service)</h2>
 <p>The optional floating Reword button uses Android's accessibility feature (AccessibilityService API) to find
@@ -70,15 +85,20 @@ keyboard. The Quick Settings tile reads your clipboard only when you tap it, to 
 <h2>Settings and API keys</h2>
 <p>Your choices, server address and any API keys you enter are stored only on your phone, in the app's
 private storage. They are not sent to us and are not included in Android's online backups. Each API
-key is sent only to the service it belongs to. Uninstalling the app deletes them.</p>
+key is sent only to the service it belongs to. The key for the Reword AI servers is made by our servers and is
+sent only to them. Uninstalling the app deletes these settings.</p>
 
-<h2>Reword Pro purchase</h2>
-<p>Reword is free. An optional one-time purchase, Reword Pro, unlocks extra styles. The purchase is handled
+<h2>Reword Pro and the Reword AI servers subscription</h2>
+<p>Reword is free. An optional one-time purchase, Reword Pro, unlocks extra styles. An optional subscription
+(monthly or yearly) gives access to the Reword AI servers and includes Reword Pro while it is active. A Reword Pro
+from a promo code also gives access to the Reword AI servers; to check this, our servers ask Google Play whether
+the Pro came from a promo code, as described above. The purchase is handled
 entirely by Google Play. We never see your name, payment method or card details. Google Play tells the app
-only whether this Google account has bought Reword Pro. The app keeps that yes-or-no answer on your phone so
-Pro works without an internet connection, and checks with Google Play again whenever you open the app. If Pro
-is refunded, the Pro styles lock again. We don't receive, store or share any purchase information, and
-Google's privacy policy applies to your purchase.</p>
+only whether this Google account has bought Reword Pro or has an active subscription. The app keeps that yes-or-no
+answer on your phone so Pro works without an internet connection, and checks with Google Play again whenever you
+open the app. If Pro is refunded or the subscription ends, the Pro styles lock again. Apart from the purchase check
+described above, we don't receive, store or share any purchase information, and Google's privacy policy applies to
+your purchase. You can cancel the subscription at any time in Google Play.</p>
 
 <h2>The on-phone AI download</h2>
 <p>If you choose the on-phone AI, the app downloads the Gemma 4 model file (about 2.6 GB) from Hugging Face
@@ -92,18 +112,19 @@ delete anything from it first. We use reports only to fix problems and prevent o
 
 <h2>What we don't do</h2>
 <ul>
-  <li>We don't collect personal information, and we don't have accounts.</li>
+  <li>We don't have accounts, and we don't collect your name, email address or contacts.</li>
+  <li>We don't keep your messages or rewrites, on the Reword AI servers or anywhere else.</li>
   <li>We don't sell or share your information, and the app has no advertising or analytics.</li>
   <li>We don't use your messages to train AI models.</li>
-  <li>Payments for the optional Reword Pro purchase are handled by Google Play, not by us.</li>
+  <li>Payments for Reword Pro and the subscription are handled by Google Play, not by us.</li>
 </ul>
 
 <h2>Children</h2>
 <p>Reword is not directed at children under 13.</p>
 
 <h2>Security</h2>
-<p>Every connection the app makes to send your text is encrypted (HTTPS): to the cloud AI services
-and to your own server, which must have an https:// address. Your phone's lock screen protects the
+<p>Every connection the app makes to send your text is encrypted (HTTPS): to the Reword AI servers, to the
+cloud AI services and to your own server, which must have an https:// address. Your phone's lock screen protects the
 settings stored on it.</p>
 
 <h2>Changes</h2>
